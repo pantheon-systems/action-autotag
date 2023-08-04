@@ -18,3 +18,20 @@ This action is currently experimental.
 
 ### `gh-token`
 A GitHub token with `repo` scope. This is used to create the tag and release.
+
+### Usage
+```yaml
+name: Autotag and Release
+on:
+  push:
+	branches:
+	  - main
+jobs:
+  tag-release:
+	runs-on: ubuntu-latest
+	steps:
+	  - uses: actions/checkout@v3
+	  - uses: pantheon-systems/action-autotag@v0.x
+		with:
+		  gh-token: ${{ secrets.GITHUB_TOKEN }}
+```
