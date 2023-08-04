@@ -1,0 +1,15 @@
+name: Update v0.x
+on:
+  push:
+    branches:
+      - main
+jobs:
+  tag-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update v0.x
+        run: |
+          git checkout main && git pull
+          git checkout v0.x && git pull
+          git merge main && git push
