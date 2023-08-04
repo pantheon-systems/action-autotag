@@ -1,4 +1,4 @@
-name: Autotag
+name: Autotag and Release Action
 description: Automatically create tags and releases for your project.
 author: pantheon-systems
 branding:
