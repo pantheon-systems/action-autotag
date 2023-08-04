@@ -13,3 +13,8 @@ This action will automatically create a new tag and release for your repository 
 Currently configuration is limited (see [source](https://github.com/pantheon-systems/action-autotag/blob/main/src/tag-release.sh)), but in future iterations more configuration options will be added.
 
 This action is currently experimental.
+
+## Inputs
+
+### `gh-token`
+A GitHub token with `repo` scope. This is used to create the tag and release.
