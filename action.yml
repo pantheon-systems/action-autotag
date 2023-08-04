@@ -13,8 +13,7 @@ runs:
   steps:
     - uses: actions/checkout@v3
     - name: Tag & Release
-      working-directory: ./src
       shell: bash
-      run: bash tag-release.sh
+      run: src/tag-release.sh
       env:
         GITHUB_TOKEN: ${{ inputs.gh-token }}
