@@ -2,4 +2,4 @@ lint:
 	shellcheck src/*.sh
 
 tag-release:
-	./tag-release.sh
+	src/tag-release.sh
