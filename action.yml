@@ -1,0 +1,19 @@
+name: Autotag
+description: Automatically create tags and releases for your project.
+author: pantheon-systems
+branding:
+  icon: tag
+  color: yellow
+inputs:
+  gh-token:
+    description: GitHub token with repo access
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+    - name: Tag & Release
+      shell: bash
+      run: make tag-release
+      env:
+        GITHUB_TOKEN: ${{ inputs.gh-token }}
