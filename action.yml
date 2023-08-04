@@ -14,6 +14,6 @@ runs:
     - uses: actions/checkout@v3
     - name: Tag & Release
       shell: bash
-      run: bash src/tag-release.sh
+      run: bash ./src/tag-release.sh
       env:
         GITHUB_TOKEN: ${{ inputs.gh-token }}
