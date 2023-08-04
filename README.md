@@ -23,9 +23,9 @@ A GitHub token with `repo` scope. This is used to create the tag and release.
 ```yaml
 name: Autotag and Release
 on:
-push:
+  push:
     branches:   
-        - main
+      - main
 jobs:
   tag-release:
     runs-on: ubuntu-latest
