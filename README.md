@@ -24,14 +24,18 @@ A GitHub token with `repo` scope. This is used to create the tag and release.
 name: Autotag and Release
 on:
   push:
-    branches:   
+    branches:
       - main
+
+permissions:
+  contents: write
+
 jobs:
   tag-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pantheon-systems/action-autotag@v0.x
+      - uses: actions/checkout@v4
+      - uses: pantheon-systems/action-autotag@v0
         with:
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          gh-token: ${{ github.token }}
 ```
