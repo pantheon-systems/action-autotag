@@ -5,7 +5,7 @@
 [![MIT License](https://img.shields.io/github/license/pantheon-systems/action-autotag)](https://github.com/pantheon-systems/action-autotag/blob/main/LICENSE) 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pantheon-systems/action-autotag)](https://github.com/pantheon-systems/action-autotag/releases)
 
-A GitHub action that implements [pantheon-systems/autotag](https://github.com/pantheon-systems/autotag).
+A GitHub action that implements [autotag-dev/autotag](https://github.com/autotag-dev/autotag).
 
 ## What's it do?
 This action will automatically create a new tag and release for your repository when a pull request is merged to the default branch. It will also create a changelog entry for the new tag and release.
