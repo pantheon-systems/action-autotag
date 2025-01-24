@@ -11,7 +11,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Tag & Release
       shell: bash
       run: sh ${{ github.action_path }}/src/tag-release.sh
