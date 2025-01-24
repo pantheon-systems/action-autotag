@@ -14,5 +14,3 @@ jobs:
       - uses: actions/checkout@v4
       - name: Tag & Release
         uses: ./
-        with:
-          gh-token: ${{ github.token }}
