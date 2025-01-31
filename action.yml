@@ -67,11 +67,10 @@ runs:
       shell: bash
       run: |
         NEW_RELEASE=${{ steps.tag.outputs.VERSION_TAG }}
-        MAJOR_VERSION=$(echo "${NEW_RELEASE#v}" | cut -d'.' -f1)
-
-        echo "Major version: ${MAJOR_VERSION}"
-
-        MAJOR_VERSION_BRANCH="v${MAJOR_VERSION}"
+        MAJOR_VERSION_BRANCH="v${NEW_RELEASE#v}" # Ensure it is prepended with v
+        MAJOR_VERSION_BRANCH="${MAJOR_VERSION_BRANCH%%.*}"
+        echo "Major version: ${MAJOR_VERSION_BRANCH}"
+        
         if git show-ref --verify --quiet "refs/heads/${MAJOR_VERSION_BRANCH}"; then
           git checkout "${MAJOR_VERSION_BRANCH}"
           git merge --ff-only main
