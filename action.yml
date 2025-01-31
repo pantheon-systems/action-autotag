@@ -18,7 +18,7 @@ inputs:
     required: false
     default: true # TODO: default false in v1?
   create-release:
-    description: 'Whether to create a release from the tag or not. 'true', 'false', or 'draft'.
+    description: "Whether to create a release from the tag or not. 'true', 'false'." # TODO: Support 'draft'
     required: false
     default: 'true' # TODO: default false in v1?
   workdir:
