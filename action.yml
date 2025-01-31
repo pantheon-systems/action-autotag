@@ -57,7 +57,7 @@ runs:
         echo "VERSION_TAG=${NEW_VERSION_TAG}" >> $GITHUB_OUTPUT
     - id: push-tag
       name: Push Tag
-      if: ${{ inputs.push-tag == 'v-prefix' }}
+      if: ${{ inputs.push-tag == 'true' }}
       run: git push origin ${{ steps.tag.outputs.VERSION_TAG }}
       working-directory: ${{ inputs.workdir }}
       shell: bash
