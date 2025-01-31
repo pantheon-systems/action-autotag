@@ -85,5 +85,7 @@ runs:
       if: ${{ inputs.create-release != 'false' }}
       shell: bash
       working-directory: ${{ inputs.workdir }}
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         gh release create ${{ steps.tag.outputs.VERSION_TAG }} -t ${{ steps.tag.outputs.VERSION_TAG }} --generate-notes
