@@ -40,13 +40,13 @@ runs:
       working-directory: ${{ inputs.workdir }}
       run: |
         curl -sL https://git.io/autotag-install | sh --
-        # fetch all tags and history:
-        git fetch --tags --unshallow --prune
+        # # fetch all tags and history:
+        # git fetch --tags --unshallow --prune
 
-        # This probably needs to be addressed in v1 for projects not using 'main'
-        if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
-          git branch --track main origin/main
-        fi
+        # # This probably needs to be addressed in v1 for projects not using 'main'
+        # if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
+        #   git branch --track main origin/main
+        # fi
 
         SHOULD_USE_V_PREFIX=${{ inputs.v-prefix }}
         TAG_PREFIX=""
