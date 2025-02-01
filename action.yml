@@ -37,7 +37,6 @@ runs:
     - id: tag
       name: Tag
       shell: bash
-      if: ${{ inputs.install == 'true' }}
       working-directory: ${{ inputs.workdir }}
       run: |
         if ! which autotag > /dev/null; then
