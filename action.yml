@@ -37,16 +37,17 @@ runs:
     - id: tag
       name: Tag
       shell: bash
+      if: ${{ inputs.install == 'true' }}
       working-directory: ${{ inputs.workdir }}
       run: |
-        curl -sL https://git.io/autotag-install | sh --
-
+        if ! which autotag > /dev/null; then
+          curl -sL https://git.io/autotag-install | sh --
+        fi
         SHOULD_USE_V_PREFIX=${{ inputs.v-prefix }}
         TAG_PREFIX=""
         [[ "$SHOULD_USE_V_PREFIX" == 'true' ]] && TAG_PREFIX="v"
 
-
-        NEW_VERSION_TAG="${TAG_PREFIX}$(./bin/autotag)"
+        NEW_VERSION_TAG="${TAG_PREFIX}$(autotag)"
         echo "VERSION_TAG=${NEW_VERSION_TAG}" >> $GITHUB_OUTPUT
     - id: push-tag
       name: Push Tag
