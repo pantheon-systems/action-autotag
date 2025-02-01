@@ -64,7 +64,7 @@ runs:
         MAJOR_VERSION_BRANCH="${MAJOR_VERSION_BRANCH%%.*}"
         echo "Major version: ${MAJOR_VERSION_BRANCH}"
         
-        git fetch --prune --unshallow --all
+        # git fetch --prune --unshallow --all
         if git show-ref --verify --quiet "refs/heads/${MAJOR_VERSION_BRANCH}"; then
           git checkout "${MAJOR_VERSION_BRANCH}"
           git merge --ff-only main
