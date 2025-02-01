@@ -64,7 +64,11 @@ runs:
         MAJOR_VERSION_BRANCH="${MAJOR_VERSION_BRANCH%%.*}"
         echo "Major version: ${MAJOR_VERSION_BRANCH}"
         
-        # git fetch --prune --unshallow --all
+        # TODO: I don't think this fetch should be required with the right
+        # params for action/checkout but so far have not been able to get it
+        # to work.
+        git fetch --prune --unshallow --all
+        
         if git show-ref --verify --quiet "refs/heads/${MAJOR_VERSION_BRANCH}"; then
           git checkout "${MAJOR_VERSION_BRANCH}"
           git merge --ff-only main
