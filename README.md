@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pantheon-systems/action-autotag@v0
         with:
-          gh-token: ${{ github.token }}
+          fetch-depth: 0
+      - uses: pantheon-systems/action-autotag@v0
 ```
