@@ -16,8 +16,27 @@ This action is currently experimental.
 
 ## Inputs
 
-### `gh-token`
-A GitHub token with `repo` scope. This is used to create the tag and release.
+<!-- AUTO-DOC-INPUT:START - Do not remove or modify this section -->
+
+|           INPUT           |  TYPE  | REQUIRED | DEFAULT  |                                     DESCRIPTION                                      |
+|---------------------------|--------|----------|----------|--------------------------------------------------------------------------------------|
+|      create-release       | string |  false   | `"true"` |        Whether to create a release from <br>the tag or not. 'true', 'false'.         |
+| push-major-version-branch | string |  false   | `"true"` | Push to a branch matching the <br>major version number on the origin <br>repository  |
+|         push-tag          | string |  false   | `"true"` |                      Push the tag to the origin <br>repository                       |
+|         v-prefix          | string |  false   | `"true"` |                 Whether to prefix the tag with <br>the letter 'v'.                   |
+|          workdir          | string |  false   |  `"."`   |                            Directory with the code to tag                            |
+
+<!-- AUTO-DOC-INPUT:END -->
+
+## Outputs
+
+<!-- AUTO-DOC-OUTPUT:START - Do not remove or modify this section -->
+
+| OUTPUT |  TYPE  |       DESCRIPTION        |
+|--------|--------|--------------------------|
+|  tag   | string | The tag that was created |
+
+<!-- AUTO-DOC-OUTPUT:END -->
 
 ### Usage
 ```yaml
