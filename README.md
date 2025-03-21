@@ -54,5 +54,5 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: pantheon-systems/action-autotag@v0
+      - uses: pantheon-systems/action-autotag@v1
 ```
