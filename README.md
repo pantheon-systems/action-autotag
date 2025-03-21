@@ -1,6 +1,5 @@
 # Autotag action
 [![Unofficial Support](https://img.shields.io/badge/Pantheon-Unofficial_Support-yellow?logo=pantheon&color=FFDC28)](https://docs.pantheon.io/oss-support-levels#unofficial-support)
-[![Lint](https://github.com/pantheon-systems/action-autotag/actions/workflows/lint.yml/badge.svg)](https://github.com/pantheon-systems/action-autotag/actions/workflows/lint.yml)
 [![Autotag and Release](https://github.com/pantheon-systems/action-autotag/actions/workflows/tag-release.yml/badge.svg)](https://github.com/pantheon-systems/action-autotag/actions/workflows/tag-release.yml)
 [![MIT License](https://img.shields.io/github/license/pantheon-systems/action-autotag)](https://github.com/pantheon-systems/action-autotag/blob/main/LICENSE) 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pantheon-systems/action-autotag)](https://github.com/pantheon-systems/action-autotag/releases)
