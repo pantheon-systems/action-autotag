@@ -12,19 +12,17 @@ This action will automatically create a new tag and release for your repository 
 
 Currently configuration is limited (see [source](https://github.com/pantheon-systems/action-autotag/blob/main/src/tag-release.sh)), but in future iterations more configuration options will be added.
 
-This action is currently experimental.
-
 ## Inputs
 
 <!-- AUTO-DOC-INPUT:START - Do not remove or modify this section -->
 
-|           INPUT           |  TYPE  | REQUIRED | DEFAULT  |                                     DESCRIPTION                                      |
-|---------------------------|--------|----------|----------|--------------------------------------------------------------------------------------|
-|      create-release       | string |  false   | `"true"` |        Whether to create a release from <br>the tag or not. 'true', 'false'.         |
-| push-major-version-branch | string |  false   | `"true"` | Push to a branch matching the <br>major version number on the origin <br>repository  |
-|         push-tag          | string |  false   | `"true"` |                      Push the tag to the origin <br>repository                       |
-|         v-prefix          | string |  false   | `"true"` |                 Whether to prefix the tag with <br>the letter 'v'.                   |
-|          workdir          | string |  false   |  `"."`   |                            Directory with the code to tag                            |
+|           INPUT           |  TYPE  | REQUIRED |  DEFAULT  |                                     DESCRIPTION                                      |
+|---------------------------|--------|----------|-----------|--------------------------------------------------------------------------------------|
+|      create-release       | string |  false   | `"true"`  |        Whether to create a release from <br>the tag or not. 'true', 'false'.         |
+| push-major-version-branch | string |  false   | `"false"` | Push to a branch matching the <br>major version number on the origin <br>repository  |
+|         push-tag          | string |  false   | `"true"`  |                      Push the tag to the origin <br>repository                       |
+|         v-prefix          | string |  false   | `"true"`  |                 Whether to prefix the tag with <br>the letter 'v'.                   |
+|          workdir          | string |  false   |   `"."`   |                            Directory with the code to tag                            |
 
 <!-- AUTO-DOC-INPUT:END -->
 

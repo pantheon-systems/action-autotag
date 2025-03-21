@@ -8,19 +8,19 @@ inputs:
   push-tag:
     description: 'Push the tag to the origin repository'
     required: false
-    default: true # TODO: default false in v1?
+    default: true
   push-major-version-branch:
     description: 'Push to a branch matching the major version number on the origin repository'
     required: false
-    default: true # TODO: default false in v1?
+    default: false
   v-prefix:
     description: "Whether to prefix the tag with the letter 'v'."
     required: false
-    default: true # TODO: default false in v1?
+    default: true
   create-release:
     description: "Whether to create a release from the tag or not. 'true', 'false'." # TODO: Support 'draft'
     required: false
-    default: true # TODO: default false in v1?
+    default: true
   workdir:
     description: 'Directory with the code to tag'
     required: false
