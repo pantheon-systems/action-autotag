@@ -5,15 +5,82 @@ branding:
   icon: tag
   color: yellow
 inputs:
-  gh-token:
-    description: GitHub token with repo access
-    required: true
+  push-tag:
+    description: 'Push the tag to the origin repository'
+    required: false
+    default: true
+  push-major-version-branch:
+    description: 'Push to a branch matching the major version number on the origin repository'
+    required: false
+    default: false
+  v-prefix:
+    description: "Whether to prefix the tag with the letter 'v'."
+    required: false
+    default: true
+  create-release:
+    description: "Whether to create a release from the tag or not. 'true', 'false'." # TODO: Support 'draft'
+    required: false
+    default: true
+  workdir:
+    description: 'Directory with the code to tag'
+    required: false
+    default: '.'
+
+outputs:
+  tag:
+    description: 'The tag that was created'
+    value: ${{ steps.tag.outputs.VERSION_TAG }}
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-    - name: Tag & Release
+    - id: tag
+      name: Tag
       shell: bash
-      run: sh ${{ github.action_path }}/src/tag-release.sh
+      working-directory: ${{ inputs.workdir }}
+      run: |
+        if ! which autotag > /dev/null; then
+          curl -sL https://git.io/autotag-install | sh --
+          export PATH="$PWD/bin:$PATH"
+        fi
+        SHOULD_USE_V_PREFIX=${{ inputs.v-prefix }}
+        TAG_PREFIX=""
+        [[ "$SHOULD_USE_V_PREFIX" == 'true' ]] && TAG_PREFIX="v"
+
+        NEW_VERSION_TAG="${TAG_PREFIX}$(autotag)"
+        echo "VERSION_TAG=${NEW_VERSION_TAG}" >> $GITHUB_OUTPUT
+    - id: push-tag
+      name: Push Tag
+      if: ${{ inputs.push-tag == 'true' }}
+      run: git push origin ${{ steps.tag.outputs.VERSION_TAG }}
+      working-directory: ${{ inputs.workdir }}
+      shell: bash
+    - id: push-major-version-branch
+      if: ${{ inputs.push-major-version-branch == 'true' }}
+      working-directory: ${{ inputs.workdir }}
+      shell: bash
+      run: |
+        NEW_RELEASE=${{ steps.tag.outputs.VERSION_TAG }}
+        MAJOR_VERSION_BRANCH="v${NEW_RELEASE#v}" # Ensure it is prepended with v
+        MAJOR_VERSION_BRANCH="${MAJOR_VERSION_BRANCH%%.*}"
+        echo "Major version: ${MAJOR_VERSION_BRANCH}"
+        
+        # if checked out with 'fetch-depth: 0', this will fail. Consider adjusting for v1.
+        git fetch --prune --unshallow --all || true
+        
+        if git show-ref --verify --quiet "refs/heads/${MAJOR_VERSION_BRANCH}"; then
+          git checkout "${MAJOR_VERSION_BRANCH}"
+          git merge --ff-only main
+        else
+          git checkout -b "${MAJOR_VERSION_BRANCH}"
+        fi
+
+        git push origin "${MAJOR_VERSION_BRANCH}"
+    - id: release
+      name: Create Release
+      if: ${{ inputs.create-release != 'false' }}
+      shell: bash
+      working-directory: ${{ inputs.workdir }}
       env:
-        GITHUB_TOKEN: ${{ inputs.gh-token }}
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release create ${{ steps.tag.outputs.VERSION_TAG }} -t ${{ steps.tag.outputs.VERSION_TAG }} --generate-notes

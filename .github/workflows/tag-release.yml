@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Tag & Release
         uses: ./
         with:
-          gh-token: ${{ github.token }}
+          push-major-version-branch: true
