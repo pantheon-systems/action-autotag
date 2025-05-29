@@ -44,9 +44,10 @@ runs:
         fi
         SHOULD_USE_V_PREFIX=${{ inputs.v-prefix }}
         TAG_PREFIX=""
-        [[ "$SHOULD_USE_V_PREFIX" == 'true' ]] && TAG_PREFIX="v"
+        AUTOTAG_ARGUMENTS="-e"
+        [[ "$SHOULD_USE_V_PREFIX" == 'true' ]] && TAG_PREFIX="v" && AUTOTAG_ARGUMENTS=""
 
-        NEW_VERSION_TAG="${TAG_PREFIX}$(autotag)"
+        NEW_VERSION_TAG="${TAG_PREFIX}$(autotag $AUTOTAG_ARGUMENTS)"
         echo "VERSION_TAG=${NEW_VERSION_TAG}" >> $GITHUB_OUTPUT
     - id: push-tag
       name: Push Tag
