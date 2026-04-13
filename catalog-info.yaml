@@ -1,0 +1,12 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: action-autotag
+  description: A GitHub action that implements pantheon-systems/autotag
+  annotations:
+    github.com/project-slug: pantheon-systems/action-autotag
+spec:
+  type: service
+  lifecycle: production
+  owner: site-experience
