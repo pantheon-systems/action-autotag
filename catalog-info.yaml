@@ -8,5 +8,5 @@ metadata:
     github.com/project-slug: pantheon-systems/action-autotag
 spec:
   type: service
-  lifecycle: production
+  lifecycle: mature
   owner: site-experience
