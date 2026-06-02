@@ -37,11 +37,19 @@ runs:
       name: Tag
       shell: bash
       working-directory: ${{ inputs.workdir }}
+      env:
+        AUTOTAG_VERSION: v1.4.3
+        AUTOTAG_SHA256: 85e7ec97d732800bb838085fd3f2e19b2aa2ee3a8da0db7fd0aaf4113a279f3a
       run: |
-        if ! which autotag > /dev/null; then
-          curl -sL https://git.io/autotag-install | sh --
-          export PATH="$PWD/bin:$PATH"
+        set -euo pipefail
+
+        if ! command -v autotag &>/dev/null; then
+          curl -fsSLo /usr/local/bin/autotag \
+            "https://github.com/autotag-dev/autotag/releases/download/${AUTOTAG_VERSION}/autotag_linux_amd64"
+          echo "${AUTOTAG_SHA256}  /usr/local/bin/autotag" | sha256sum -c -
+          chmod +x /usr/local/bin/autotag
         fi
+
         SHOULD_USE_V_PREFIX=${{ inputs.v-prefix }}
         TAG_PREFIX=""
         AUTOTAG_ARGUMENTS="-e"
@@ -51,7 +59,7 @@ runs:
         fi
 
         NEW_VERSION_TAG="${TAG_PREFIX}$(autotag $AUTOTAG_ARGUMENTS)"
-        echo "VERSION_TAG=${NEW_VERSION_TAG}" >> $GITHUB_OUTPUT
+        echo "VERSION_TAG=${NEW_VERSION_TAG}" >> "$GITHUB_OUTPUT"
     - id: push-tag
       name: Push Tag
       if: ${{ inputs.push-tag == 'true' }}
