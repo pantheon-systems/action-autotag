@@ -1,0 +1,19 @@
+name: Check autotag version
+
+on:
+  schedule:
+    - cron: '17 14 * * 1' # Weekly on Monday
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: pantheon-systems/action-package-updater@51f94cad4ee60ddcab8918f74f8d1d2d10325f6e # v1.1.19
+        with:
+          dependencies-yml: dependencies.yml

@@ -9,7 +9,7 @@ A GitHub action that implements [autotag-dev/autotag](https://github.com/autotag
 ## What's it do?
 This action will automatically create a new tag and release for your repository when a pull request is merged to the default branch. It will also create a changelog entry for the new tag and release.
 
-Currently configuration is limited (see [source](https://github.com/pantheon-systems/action-autotag/blob/main/src/tag-release.sh)), but in future iterations more configuration options will be added.
+The action pins a specific version of the autotag binary with SHA-256 checksum verification. A [scheduled workflow](.github/workflows/check-autotag-version.yml) checks for new upstream releases weekly and opens a PR when one is available.
 
 ## Inputs
 
@@ -34,6 +34,21 @@ Currently configuration is limited (see [source](https://github.com/pantheon-sys
 |  tag   | string | The tag that was created |
 
 <!-- AUTO-DOC-OUTPUT:END -->
+
+### Updating the pinned autotag version
+
+The autotag binary version and SHA-256 checksum are defined in `action.yml` (env vars `AUTOTAG_VERSION` and `AUTOTAG_SHA256`). The version is also tracked in `dependencies.yml` for automated update detection.
+
+When a new version is available, the scheduled workflow opens a PR bumping `dependencies.yml`. To complete the update:
+
+1. Update `AUTOTAG_VERSION` in `action.yml` to the new version
+2. Fetch the new checksum:
+   ```sh
+   VERSION=v1.4.3  # replace with new version
+   curl -sL "https://github.com/autotag-dev/autotag/releases/download/${VERSION}/autotag_${VERSION#v}_checksums.txt" \
+     | grep 'autotag_linux_amd64$'
+   ```
+3. Update `AUTOTAG_SHA256` in `action.yml` with the hash from step 2
 
 ### Usage
 ```yaml

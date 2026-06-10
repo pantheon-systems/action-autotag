@@ -1,0 +1,8 @@
+dependencies:
+  autotag:
+    current_tag: v1.4.3
+    repo: autotag-dev/autotag
+    pr_note: >
+      After merging this version bump, update AUTOTAG_SHA256 in action.yml
+      with the checksum for the new version's `autotag_linux_amd64` binary
+      from the release's checksums.txt file.
