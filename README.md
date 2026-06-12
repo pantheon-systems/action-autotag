@@ -17,7 +17,7 @@ The action pins a specific version of the autotag binary with SHA-256 checksum v
 
 |           INPUT           |  TYPE  | REQUIRED |  DEFAULT  |                                     DESCRIPTION                                      |
 |---------------------------|--------|----------|-----------|--------------------------------------------------------------------------------------|
-|      create-release       | string |  false   | `"true"`  |        Whether to create a release from <br>the tag or not. 'true', 'false'.         |
+|      create-release       | string |  false   | `"true"`  | Whether to create a release from <br>the tag or not. 'true', 'false', <br>'draft'.   |
 | push-major-version-branch | string |  false   | `"false"` | Push to a branch matching the <br>major version number on the origin <br>repository  |
 |         push-tag          | string |  false   | `"true"`  |                      Push the tag to the origin <br>repository                       |
 |         v-prefix          | string |  false   | `"true"`  |                 Whether to prefix the tag with <br>the letter 'v'.                   |

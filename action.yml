@@ -18,7 +18,7 @@ inputs:
     required: false
     default: true
   create-release:
-    description: "Whether to create a release from the tag or not. 'true', 'false'." # TODO: Support 'draft'
+    description: "Whether to create a release from the tag or not. 'true', 'false', 'draft'."
     required: false
     default: true
   workdir:
@@ -95,4 +95,10 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        gh release create ${{ steps.tag.outputs.VERSION_TAG }} -t ${{ steps.tag.outputs.VERSION_TAG }} --generate-notes
+        DRAFT_FLAG=""
+        if [[ "${{ inputs.create-release }}" == "draft" ]]; then
+          DRAFT_FLAG="--draft"
+        fi
+        gh release create ${{ steps.tag.outputs.VERSION_TAG }} \
+          -t ${{ steps.tag.outputs.VERSION_TAG }} \
+          --generate-notes $DRAFT_FLAG
