@@ -100,10 +100,16 @@ runs:
         VERSION_TAG: ${{ steps.tag.outputs.VERSION_TAG }}
         CREATE_RELEASE: ${{ inputs.create-release }}
       run: |
-        DRAFT_FLAG=""
-        if [[ "$CREATE_RELEASE" == "draft" ]]; then
-          DRAFT_FLAG="--draft"
-        fi
+        DRAFT_FLAG=()
+        case "$CREATE_RELEASE" in
+          true) ;;
+          draft) DRAFT_FLAG+=(--draft) ;;
+          *)
+            echo "::error::Invalid value for create-release: '$CREATE_RELEASE' (expected 'true', 'false', or 'draft')"
+            exit 1
+            ;;
+        esac
         gh release create "$VERSION_TAG" \
           -t "$VERSION_TAG" \
-          --generate-notes $DRAFT_FLAG
+          --generate-notes \
+          "${DRAFT_FLAG[@]}"
