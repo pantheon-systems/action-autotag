@@ -18,7 +18,7 @@ inputs:
     required: false
     default: true
   create-release:
-    description: "Whether to create a release from the tag or not. 'true', 'false'." # TODO: Support 'draft'
+    description: "Whether to create a release from the tag or not. 'true', 'false', 'draft'."
     required: false
     default: true
   workdir:
@@ -40,6 +40,7 @@ runs:
       env:
         AUTOTAG_VERSION: v1.4.3
         AUTOTAG_SHA256: 85e7ec97d732800bb838085fd3f2e19b2aa2ee3a8da0db7fd0aaf4113a279f3a
+        V_PREFIX: ${{ inputs.v-prefix }}
       run: |
         set -euo pipefail
 
@@ -50,10 +51,9 @@ runs:
           chmod +x /usr/local/bin/autotag
         fi
 
-        SHOULD_USE_V_PREFIX=${{ inputs.v-prefix }}
         TAG_PREFIX=""
         AUTOTAG_ARGUMENTS="-e"
-        if [[ "$SHOULD_USE_V_PREFIX" == 'true' ]]; then
+        if [[ "$V_PREFIX" == 'true' ]]; then
           TAG_PREFIX="v"
           AUTOTAG_ARGUMENTS=""
         fi
@@ -63,16 +63,19 @@ runs:
     - id: push-tag
       name: Push Tag
       if: ${{ inputs.push-tag == 'true' }}
-      run: git push origin ${{ steps.tag.outputs.VERSION_TAG }}
       working-directory: ${{ inputs.workdir }}
       shell: bash
+      env:
+        VERSION_TAG: ${{ steps.tag.outputs.VERSION_TAG }}
+      run: git push origin "$VERSION_TAG"
     - id: push-major-version-branch
       if: ${{ inputs.push-major-version-branch == 'true' }}
       working-directory: ${{ inputs.workdir }}
       shell: bash
+      env:
+        VERSION_TAG: ${{ steps.tag.outputs.VERSION_TAG }}
       run: |
-        NEW_RELEASE=${{ steps.tag.outputs.VERSION_TAG }}
-        MAJOR_VERSION_BRANCH="v${NEW_RELEASE#v}" # Ensure it is prepended with v
+        MAJOR_VERSION_BRANCH="v${VERSION_TAG#v}"
         MAJOR_VERSION_BRANCH="${MAJOR_VERSION_BRANCH%%.*}"
         echo "Major version: ${MAJOR_VERSION_BRANCH}"
         
@@ -94,5 +97,19 @@ runs:
       working-directory: ${{ inputs.workdir }}
       env:
         GH_TOKEN: ${{ github.token }}
+        VERSION_TAG: ${{ steps.tag.outputs.VERSION_TAG }}
+        CREATE_RELEASE: ${{ inputs.create-release }}
       run: |
-        gh release create ${{ steps.tag.outputs.VERSION_TAG }} -t ${{ steps.tag.outputs.VERSION_TAG }} --generate-notes
+        DRAFT_FLAG=()
+        case "$CREATE_RELEASE" in
+          true) ;;
+          draft) DRAFT_FLAG+=(--draft) ;;
+          *)
+            echo "::error::Invalid value for create-release: '$CREATE_RELEASE' (expected 'true', 'false', or 'draft')"
+            exit 1
+            ;;
+        esac
+        gh release create "$VERSION_TAG" \
+          -t "$VERSION_TAG" \
+          --generate-notes \
+          "${DRAFT_FLAG[@]}"

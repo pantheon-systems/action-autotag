@@ -17,7 +17,7 @@ The action pins a specific version of the autotag binary with SHA-256 checksum v
 
 |           INPUT           |  TYPE  | REQUIRED |  DEFAULT  |                                     DESCRIPTION                                      |
 |---------------------------|--------|----------|-----------|--------------------------------------------------------------------------------------|
-|      create-release       | string |  false   | `"true"`  |        Whether to create a release from <br>the tag or not. 'true', 'false'.         |
+|      create-release       | string |  false   | `"true"`  | Whether to create a release from <br>the tag or not. 'true', 'false', <br>'draft'.   |
 | push-major-version-branch | string |  false   | `"false"` | Push to a branch matching the <br>major version number on the origin <br>repository  |
 |         push-tag          | string |  false   | `"true"`  |                      Push the tag to the origin <br>repository                       |
 |         v-prefix          | string |  false   | `"true"`  |                 Whether to prefix the tag with <br>the letter 'v'.                   |
@@ -35,22 +35,7 @@ The action pins a specific version of the autotag binary with SHA-256 checksum v
 
 <!-- AUTO-DOC-OUTPUT:END -->
 
-### Updating the pinned autotag version
-
-The autotag binary version and SHA-256 checksum are defined in `action.yml` (env vars `AUTOTAG_VERSION` and `AUTOTAG_SHA256`). The version is also tracked in `dependencies.yml` for automated update detection.
-
-When a new version is available, the scheduled workflow opens a PR bumping `dependencies.yml`. To complete the update:
-
-1. Update `AUTOTAG_VERSION` in `action.yml` to the new version
-2. Fetch the new checksum:
-   ```sh
-   VERSION=v1.4.3  # replace with new version
-   curl -sL "https://github.com/autotag-dev/autotag/releases/download/${VERSION}/autotag_${VERSION#v}_checksums.txt" \
-     | grep 'autotag_linux_amd64$'
-   ```
-3. Update `AUTOTAG_SHA256` in `action.yml` with the hash from step 2
-
-### Usage
+## Usage
 ```yaml
 name: Autotag and Release
 on:
@@ -70,3 +55,19 @@ jobs:
           fetch-depth: 0
       - uses: pantheon-systems/action-autotag@v1
 ```
+
+## Development
+### Updating the pinned autotag version
+
+The autotag binary version and SHA-256 checksum are defined in `action.yml` (env vars `AUTOTAG_VERSION` and `AUTOTAG_SHA256`). The version is also tracked in `dependencies.yml` for automated update detection.
+
+When a new version is available, the scheduled workflow opens a PR bumping `dependencies.yml`. To complete the update:
+
+1. Update `AUTOTAG_VERSION` in `action.yml` to the new version
+2. Fetch the new checksum:
+   ```sh
+   VERSION=v1.4.3  # replace with new version
+   curl -sL "https://github.com/autotag-dev/autotag/releases/download/${VERSION}/autotag_${VERSION#v}_checksums.txt" \
+     | grep 'autotag_linux_amd64$'
+   ```
+3. Update `AUTOTAG_SHA256` in `action.yml` with the hash from step 2
