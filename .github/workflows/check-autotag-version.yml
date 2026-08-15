@@ -14,6 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: pantheon-systems/action-package-updater@51f94cad4ee60ddcab8918f74f8d1d2d10325f6e # v1.1.19
+      - uses: pantheon-systems/action-package-updater@e3a0ba1dce60b999590421a336e0de01aaadde15 # v1.1.21
         with:
           dependencies-yml: dependencies.yml
