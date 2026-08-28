@@ -1,72 +1,99 @@
 #!/usr/bin/env bats
 #
-# Table-driven tests for scripts/build-args.sh.
+# Tests for scripts/build-args.sh, which turns the action's 'scheme' input
+# into the argument list passed to autotag.
 
 setup() {
   BUILD_ARGS="${BATS_TEST_DIRNAME}/../scripts/build-args.sh"
 }
 
-# Each case is: scheme | expected args (newline-escaped)
-@test "builds the expected argument list for every valid scheme" {
-  local cases=(
-    '|-e'
-    'autotag|-e\n--scheme\nautotag'
-    'conventional|-e\n--scheme\nconventional'
-  )
+# --- valid schemes -----------------------------------------------------------
 
-  local failures=0
-  for case in "${cases[@]}"; do
-    local scheme="${case%%|*}"
-    local expected
-    expected="$(printf '%b' "${case#*|}")"
-
-    local actual
-    actual="$("$BUILD_ARGS" "$scheme")"
-
-    if [[ "$actual" != "$expected" ]]; then
-      echo "FAIL: scheme=${scheme}"
-      echo "  expected: $(printf '%q' "$expected")"
-      echo "  actual:   $(printf '%q' "$actual")"
-      failures=$((failures + 1))
-    fi
-  done
-
-  [ "$failures" -eq 0 ]
-}
-
-@test "always passes -e, since the action applies the v prefix itself" {
+@test "empty scheme passes only -e" {
   run "$BUILD_ARGS" ""
   [ "$status" -eq 0 ]
-  [ "$output" = "-e" ]
+  [ "${#lines[@]}" -eq 1 ]
+  [ "${lines[0]}" = "-e" ]
 }
 
-@test "defaults to no --scheme when the input is omitted entirely" {
+@test "omitted scheme passes only -e" {
   run "$BUILD_ARGS"
   [ "$status" -eq 0 ]
-  [ "$output" = "-e" ]
+  [ "${#lines[@]}" -eq 1 ]
+  [ "${lines[0]}" = "-e" ]
 }
 
-@test "emits --scheme and its value as separate arguments" {
-  # Guards against regressing to a single "--scheme conventional" token,
-  # which autotag would reject as an unknown flag.
+@test "autotag scheme passes -e and --scheme autotag" {
+  run "$BUILD_ARGS" "autotag"
+  [ "$status" -eq 0 ]
+  [ "${#lines[@]}" -eq 3 ]
+  [ "${lines[0]}" = "-e" ]
+  [ "${lines[1]}" = "--scheme" ]
+  [ "${lines[2]}" = "autotag" ]
+}
+
+@test "conventional scheme passes -e and --scheme conventional" {
   run "$BUILD_ARGS" "conventional"
   [ "$status" -eq 0 ]
+  [ "${#lines[@]}" -eq 3 ]
   [ "${lines[0]}" = "-e" ]
   [ "${lines[1]}" = "--scheme" ]
   [ "${lines[2]}" = "conventional" ]
-  [ "${#lines[@]}" -eq 3 ]
 }
 
-@test "rejects an invalid scheme" {
-  # autotag itself accepts an unknown scheme silently and falls back to
-  # default bumping, so this validation is what turns a typo into a failed
-  # build rather than a wrong version.
+# --e is unconditional because the action applies the 'v' prefix itself via
+# TAG_PREFIX, so autotag is always asked for a bare version. Keeping it
+# unconditional also means the argument array is never empty, which would
+# otherwise trip 'set -u' on bash < 4.4.
+@test "-e is always the first argument" {
+  local scheme
+  for scheme in "" "autotag" "conventional"; do
+    run "$BUILD_ARGS" "$scheme"
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "-e" ]
+  done
+}
+
+# --scheme and its value must stay separate argv entries; collapsing them into
+# a single "--scheme conventional" token makes autotag reject the flag.
+@test "--scheme and its value are separate arguments, not one token" {
+  run "$BUILD_ARGS" "conventional"
+  [ "$status" -eq 0 ]
+  [ "${lines[1]}" = "--scheme" ]
+  [ "${lines[2]}" = "conventional" ]
+}
+
+# --- invalid schemes ---------------------------------------------------------
+#
+# autotag itself accepts an unknown --scheme silently and falls back to its
+# default bumping, so this validation is what turns a typo into a failed build
+# rather than a silently wrong release version.
+
+@test "rejects a misspelled scheme" {
   run "$BUILD_ARGS" "conventionel"
   [ "$status" -ne 0 ]
   [[ "$output" == *"Invalid value for scheme: 'conventionel'"* ]]
 }
 
-@test "rejects a scheme that differs only by case" {
+@test "rejects a scheme differing only by case" {
   run "$BUILD_ARGS" "Conventional"
   [ "$status" -ne 0 ]
+  [[ "$output" == *"Invalid value for scheme:"* ]]
+}
+
+@test "rejects a scheme with surrounding whitespace" {
+  run "$BUILD_ARGS" " conventional"
+  [ "$status" -ne 0 ]
+}
+
+@test "rejects an autotag flag passed as a scheme" {
+  run "$BUILD_ARGS" "--strict-match"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Invalid value for scheme:"* ]]
+}
+
+@test "error message names the accepted values" {
+  run "$BUILD_ARGS" "nope"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"expected '', 'autotag', or 'conventional'"* ]]
 }
