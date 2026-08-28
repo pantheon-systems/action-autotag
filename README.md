@@ -69,7 +69,31 @@ By default autotag reads `[minor]` / `[major]` markers in commit subjects. To us
           scheme: conventional
 ```
 
+Under this scheme, a major bump is signalled either by a `!` before the colon
+(`feat!:`, `feat(api)!:`) or by a `BREAKING CHANGE:` footer in the commit body,
+which outranks the commit type — a `fix:` with that footer is still a major bump.
+
+> [!NOTE]
+> The Conventional Commits spec also allows a hyphenated `BREAKING-CHANGE:`
+> footer, but autotag v1.4.3 does not recognise it and treats such a commit as a
+> minor bump. Use `BREAKING CHANGE:` (with a space) or the `!` form.
+
 ## Development
+### Tests
+
+| Command | What it covers |
+|---|---|
+| `make test` | Unit tests (bats) for `scripts/build-args.sh` — the autotag argument list built from each input combination. Requires `bats` (`brew install bats-core`). |
+| `make test-integration` | Runs the real pinned autotag binary against throwaway git repos to verify the flags are accepted and produce the expected bumps. Linux only, since the pinned binary is `linux_amd64`. |
+
+On macOS, run the integration suite in a container:
+
+```sh
+docker run --rm -v "$PWD":/w -w /w ubuntu:24.04 tests/integration.sh
+```
+
+Both suites run in CI on every pull request via [`.github/workflows/test.yml`](.github/workflows/test.yml).
+
 ### Updating the pinned autotag version
 
 The autotag binary version and SHA-256 checksum are defined in `action.yml` (env vars `AUTOTAG_VERSION` and `AUTOTAG_SHA256`). The version is also tracked in `dependencies.yml` for automated update detection.
