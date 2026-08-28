@@ -69,15 +69,6 @@ By default autotag reads `[minor]` / `[major]` markers in commit subjects. To us
           scheme: conventional
 ```
 
-Under this scheme, a major bump is signalled either by a `!` before the colon
-(`feat!:`, `feat(api)!:`) or by a `BREAKING CHANGE:` footer in the commit body,
-which outranks the commit type — a `fix:` with that footer is still a major bump.
-
-> [!NOTE]
-> The Conventional Commits spec also allows a hyphenated `BREAKING-CHANGE:`
-> footer, but autotag v1.4.3 does not recognise it and treats such a commit as a
-> minor bump. Use `BREAKING CHANGE:` (with a space) or the `!` form.
-
 ## Development
 ### Tests
 
