@@ -15,14 +15,14 @@ The action pins a specific version of the autotag binary with SHA-256 checksum v
 
 <!-- AUTO-DOC-INPUT:START - Do not remove or modify this section -->
 
-|           INPUT           |  TYPE  | REQUIRED |  DEFAULT  |                                     DESCRIPTION                                      |
-|---------------------------|--------|----------|-----------|--------------------------------------------------------------------------------------|
-|   conventional-commits    | string |  false   | `"false"` | Use the conventional commits scheme to <br>determine the version bump.              |
-|      create-release       | string |  false   | `"true"`  | Whether to create a release from <br>the tag or not. 'true', 'false', <br>'draft'.   |
-| push-major-version-branch | string |  false   | `"false"` | Push to a branch matching the <br>major version number on the origin <br>repository  |
-|         push-tag          | string |  false   | `"true"`  |                      Push the tag to the origin <br>repository                       |
-|         v-prefix          | string |  false   | `"true"`  |                 Whether to prefix the tag with <br>the letter 'v'.                   |
-|          workdir          | string |  false   |   `"."`   |                            Directory with the code to tag                            |
+|           INPUT           |  TYPE  | REQUIRED |  DEFAULT  |                                                           DESCRIPTION                                                            |
+|---------------------------|--------|----------|-----------|----------------------------------------------------------------------------------------------------------------------------------|
+|      create-release       | string |  false   | `"true"`  |                       Whether to create a release from <br>the tag or not. 'true', 'false', <br>'draft'.                         |
+| push-major-version-branch | string |  false   | `"false"` |                       Push to a branch matching the <br>major version number on the origin <br>repository                        |
+|         push-tag          | string |  false   | `"true"`  |                                            Push the tag to the origin <br>repository                                             |
+|          scheme           | string |  false   |           | Commit message scheme autotag uses to <br>determine the version bump. '' (autotag's default), <br>'autotag', or 'conventional'.  |
+|         v-prefix          | string |  false   | `"true"`  |                                       Whether to prefix the tag with <br>the letter 'v'.                                         |
+|          workdir          | string |  false   |   `"."`   |                                                  Directory with the code to tag                                                  |
 
 <!-- AUTO-DOC-INPUT:END -->
 
@@ -55,6 +55,18 @@ jobs:
         with:
           fetch-depth: 0
       - uses: pantheon-systems/action-autotag@v1
+```
+
+### Conventional Commits
+
+By default autotag reads `[minor]` / `[major]` markers in commit subjects. To use
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) instead, so that
+`feat:` bumps the minor version and `fix:` bumps the patch version:
+
+```yaml
+      - uses: pantheon-systems/action-autotag@v1
+        with:
+          scheme: conventional
 ```
 
 ## Development
