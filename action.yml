@@ -64,9 +64,6 @@ runs:
           TAG_PREFIX="v"
         fi
 
-        # Assign the helper's output to a variable first: a failure there is
-        # caught by 'set -e', whereas a failing process substitution is not
-        # and would silently yield an empty argument list.
         RAW_ARGUMENTS="$("${GITHUB_ACTION_PATH}/scripts/build-args.sh" "$SCHEME")"
 
         AUTOTAG_ARGUMENTS=()
