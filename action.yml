@@ -21,6 +21,10 @@ inputs:
     description: "Whether to create a release from the tag or not. 'true', 'false', 'draft'."
     required: false
     default: true
+  scheme:
+    description: "Commit message scheme autotag uses to determine the version bump. '' (autotag's default), 'autotag', or 'conventional'."
+    required: false
+    default: ''
   workdir:
     description: 'Directory with the code to tag'
     required: false
@@ -41,6 +45,7 @@ runs:
         AUTOTAG_VERSION: v1.4.3
         AUTOTAG_SHA256: 85e7ec97d732800bb838085fd3f2e19b2aa2ee3a8da0db7fd0aaf4113a279f3a
         V_PREFIX: ${{ inputs.v-prefix }}
+        SCHEME: ${{ inputs.scheme }}
       run: |
         set -euo pipefail
 
@@ -51,14 +56,22 @@ runs:
           chmod +x /usr/local/bin/autotag
         fi
 
+        # The 'v' prefix is applied below via TAG_PREFIX, so autotag is always
+        # asked for a bare version: -e (--empty-version-prefix) tells it not to
+        # prepend its own 'v'.
         TAG_PREFIX=""
-        AUTOTAG_ARGUMENTS="-e"
         if [[ "$V_PREFIX" == 'true' ]]; then
           TAG_PREFIX="v"
-          AUTOTAG_ARGUMENTS=""
         fi
 
-        NEW_VERSION_TAG="${TAG_PREFIX}$(autotag $AUTOTAG_ARGUMENTS)"
+        RAW_ARGUMENTS="$("${GITHUB_ACTION_PATH}/scripts/build-args.sh" "$SCHEME")"
+
+        AUTOTAG_ARGUMENTS=()
+        while IFS= read -r arg; do
+          AUTOTAG_ARGUMENTS+=("$arg")
+        done <<< "$RAW_ARGUMENTS"
+
+        NEW_VERSION_TAG="${TAG_PREFIX}$(autotag "${AUTOTAG_ARGUMENTS[@]}")"
         echo "VERSION_TAG=${NEW_VERSION_TAG}" >> "$GITHUB_OUTPUT"
     - id: push-tag
       name: Push Tag
