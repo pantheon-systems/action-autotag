@@ -61,7 +61,7 @@ check() {
   dir="$(make_repo "$@")"
 
   local raw
-  if ! raw="$("$BUILD_ARGS" "$scheme")"; then
+  if ! raw="$("$BUILD_ARGS" "$scheme" "$v_prefix")"; then
     echo "FAIL: ${desc}"
     echo "  build-args.sh rejected scheme '${scheme}'"
     failures=$((failures + 1))
@@ -71,7 +71,9 @@ check() {
 
   local args=()
   while IFS= read -r arg; do
-    args+=("$arg")
+    if [[ -n "$arg" ]]; then
+      args+=("$arg")
+    fi
   done <<< "$raw"
 
   local prefix=""
@@ -81,7 +83,7 @@ check() {
   # action does. stderr is left on the terminal rather than folded into the
   # compared value, so a warning cannot masquerade as an assertion diff.
   local actual
-  if ! actual="${prefix}$(cd "$dir" && "$AUTOTAG" "${args[@]}")"; then
+  if ! actual="${prefix}$(cd "$dir" && "$AUTOTAG" ${args[@]+"${args[@]}"})"; then
     echo "FAIL: ${desc} (autotag exited non-zero; see stderr above)"
     failures=$((failures + 1))
     rm -rf "$dir"
@@ -97,11 +99,14 @@ check() {
     return
   fi
 
-  # The tag must actually exist in the repo, since autotag ran for real.
-  if ! git -C "$dir" rev-parse -q --verify "refs/tags/${actual#v}" >/dev/null &&
-     ! git -C "$dir" rev-parse -q --verify "refs/tags/${actual}" >/dev/null; then
+  # The tag autotag CREATED must be exactly the tag the action goes on to
+  # push. Accepting either the prefixed or bare form here is what let the
+  # created-vs-pushed mismatch through: autotag prints a bare version in both
+  # modes, so only the created ref distinguishes them.
+  if ! git -C "$dir" rev-parse -q --verify "refs/tags/${actual}" >/dev/null; then
     echo "FAIL: ${desc}"
-    echo "  autotag reported ${actual} but created no matching tag"
+    echo "  autotag reported ${actual} but created no tag by that name"
+    echo "  tags present: $(git -C "$dir" tag -l | tr '\n' ' ')"
     failures=$((failures + 1))
     rm -rf "$dir"
     return
