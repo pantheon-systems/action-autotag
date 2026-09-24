@@ -1,12 +1,14 @@
+# Managed by github-terraform — do not edit manually
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: action-autotag
-  description: A GitHub action that implements pantheon-systems/autotag
+  name: "action-autotag"
+  description: "A GitHub action that implements pantheon-systems/autotag"
   annotations:
-    github.com/project-slug: pantheon-systems/action-autotag
+    "backstage.io/techdocs-ref": "dir:docs/"
+    "github.com/project-slug": "pantheon-systems/action-autotag"
 spec:
-  type: service
-  lifecycle: mature
-  owner: site-experience
+  type: "gcp-service"
+  lifecycle: "mature"
+  owner: "site-experience"
