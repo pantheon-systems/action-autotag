@@ -9,19 +9,20 @@ A GitHub action that implements [autotag-dev/autotag](https://github.com/autotag
 ## What's it do?
 This action will automatically create a new tag and release for your repository when a pull request is merged to the default branch. It will also create a changelog entry for the new tag and release.
 
-Currently configuration is limited (see [source](https://github.com/pantheon-systems/action-autotag/blob/main/src/tag-release.sh)), but in future iterations more configuration options will be added.
+The action pins a specific version of the autotag binary with SHA-256 checksum verification. A [scheduled workflow](.github/workflows/check-autotag-version.yml) checks for new upstream releases weekly and opens a PR when one is available.
 
 ## Inputs
 
 <!-- AUTO-DOC-INPUT:START - Do not remove or modify this section -->
 
-|           INPUT           |  TYPE  | REQUIRED |  DEFAULT  |                                     DESCRIPTION                                      |
-|---------------------------|--------|----------|-----------|--------------------------------------------------------------------------------------|
-|      create-release       | string |  false   | `"true"`  |        Whether to create a release from <br>the tag or not. 'true', 'false'.         |
-| push-major-version-branch | string |  false   | `"false"` | Push to a branch matching the <br>major version number on the origin <br>repository  |
-|         push-tag          | string |  false   | `"true"`  |                      Push the tag to the origin <br>repository                       |
-|         v-prefix          | string |  false   | `"true"`  |                 Whether to prefix the tag with <br>the letter 'v'.                   |
-|          workdir          | string |  false   |   `"."`   |                            Directory with the code to tag                            |
+|           INPUT           |  TYPE  | REQUIRED |  DEFAULT  |                                                           DESCRIPTION                                                            |
+|---------------------------|--------|----------|-----------|----------------------------------------------------------------------------------------------------------------------------------|
+|      create-release       | string |  false   | `"true"`  |                       Whether to create a release from <br>the tag or not. 'true', 'false', <br>'draft'.                         |
+| push-major-version-branch | string |  false   | `"false"` |                       Push to a branch matching the <br>major version number on the origin <br>repository                        |
+|         push-tag          | string |  false   | `"true"`  |                                            Push the tag to the origin <br>repository                                             |
+|          scheme           | string |  false   |           | Commit message scheme autotag uses to <br>determine the version bump. '' (autotag's default), <br>'autotag', or 'conventional'.  |
+|         v-prefix          | string |  false   | `"true"`  |                                       Whether to prefix the tag with <br>the letter 'v'.                                         |
+|          workdir          | string |  false   |   `"."`   |                                                  Directory with the code to tag                                                  |
 
 <!-- AUTO-DOC-INPUT:END -->
 
@@ -35,7 +36,7 @@ Currently configuration is limited (see [source](https://github.com/pantheon-sys
 
 <!-- AUTO-DOC-OUTPUT:END -->
 
-### Usage
+## Usage
 ```yaml
 name: Autotag and Release
 on:
@@ -55,3 +56,46 @@ jobs:
           fetch-depth: 0
       - uses: pantheon-systems/action-autotag@v1
 ```
+
+### Conventional Commits
+
+By default autotag reads `[minor]` / `[major]` markers in commit subjects. To use
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) instead, so that
+`feat:` bumps the minor version and `fix:` bumps the patch version:
+
+```yaml
+      - uses: pantheon-systems/action-autotag@v1
+        with:
+          scheme: conventional
+```
+
+## Development
+### Tests
+
+| Command | What it covers |
+|---|---|
+| `make test` | Unit tests (bats) for `scripts/build-args.sh` — the autotag argument list built from each input combination. Requires `bats` (`brew install bats-core`). |
+| `make test-integration` | Runs the real pinned autotag binary against throwaway git repos to verify the flags are accepted and produce the expected bumps. Linux only, since the pinned binary is `linux_amd64`. |
+
+On macOS, run the integration suite in a container:
+
+```sh
+docker run --rm -v "$PWD":/w -w /w ubuntu:24.04 tests/integration.sh
+```
+
+Both suites run in CI on every pull request via [`.github/workflows/test.yml`](.github/workflows/test.yml).
+
+### Updating the pinned autotag version
+
+The autotag binary version and SHA-256 checksum are defined in `action.yml` (env vars `AUTOTAG_VERSION` and `AUTOTAG_SHA256`). The version is also tracked in `dependencies.yml` for automated update detection.
+
+When a new version is available, the scheduled workflow opens a PR bumping `dependencies.yml`. To complete the update:
+
+1. Update `AUTOTAG_VERSION` in `action.yml` to the new version
+2. Fetch the new checksum:
+   ```sh
+   VERSION=v1.4.3  # replace with new version
+   curl -sL "https://github.com/autotag-dev/autotag/releases/download/${VERSION}/autotag_${VERSION#v}_checksums.txt" \
+     | grep 'autotag_linux_amd64$'
+   ```
+3. Update `AUTOTAG_SHA256` in `action.yml` with the hash from step 2
